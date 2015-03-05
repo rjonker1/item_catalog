@@ -1,4 +1,4 @@
-# Tournament Planner #
+# Item Catalog #
 
 * Contributors: Rudi Jonker
 * Requires at least: Python 2.7
