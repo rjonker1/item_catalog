@@ -2,8 +2,10 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, url_for
 app = Flask(__name__)
 
-## Fakes ##
-import fakes
+## Fakes  ##
+#import fakes
+
+## DAL ##
 import database_access
 
 # from sqlalchemy import create_engine
@@ -16,26 +18,23 @@ import database_access
 # DBSession = sessionmaker(bind=engine)
 # session = DBSession()
 
-## Api ##
+## Api returning JSON ##
 
-# @app.route('/restaurant/<int:restaurant_id>/menu/JSON')
-# def restaurantMenuJSON(restaurant_id):
-# 	restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
-# 	items = session.query(MenuItem).filter_by(restaurant_id = restaurant_id).all()
-# 	return jsonify(MenuItems=[i.serialize for i in items])
+@app.route('/restaurants/<int:restaurant_id>/menu/JSON')
+def restaurantMenuJSON(restaurant_id):
+	restaurant = database_access.getRestaurant(restaurant_id)
+	items = database_access.getMenuItems(restaurant_id)
+	return jsonify(MenuItems=[i.serialize for i in items])
 
+@app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/JSON')
+def menuItemJSON(restaurant_id, menu_id):
+	Menu_Item = database_access.getMenuItem(menu_id)
+	return jsonify(Menu_Item = Menu_Item.serialize)
 
-
-# @app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/JSON')
-# def menuItemJSON(restaurant_id, menu_id):
-# 	Menu_Item = session.query(MenuItem).filter_by(id = menu_id).one()
-# 	return jsonify(Menu_Item = Menu_Item.serialize)
-
-# @app.route('/restaurant/JSON')
-# def restaurantsJSON():
-# 	restaurants = session.query(Restaurant).all()
-# 	return jsonify(restaurants= [r.serialize for r in restaurants])
-
+@app.route('/restaurants/JSON')
+def restaurantsJSON():
+	restaurants = database_access.getRestaurants()
+	return jsonify(restaurants= [r.serialize for r in restaurants])
 
 #Show all restaurants
 @app.route('/')
@@ -49,10 +48,11 @@ def showRestaurants():
 @app.route('/restaurants/<int:restaurant_id>/')
 @app.route('/restaurants/<int:restaurant_id>/menu')
 def showMenu(restaurant_id):
-	restaurant = fakes.restaurant
-	items = fakes.items
-	#restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
-	#items = session.query(MenuItem).filter_by(restaurant_id = restaurant_id).all()	
+	# restaurant = fakes.restaurant
+	# items = fakes.items
+	restaurant = database_access.getRestaurant(restaurant_id)
+	print(restaurant)
+	items = database_access.getMenuItems(restaurant_id)
 	return render_template('menu.html', items = items, restaurant = restaurant)
 
 #Create a new restaurant
@@ -60,8 +60,7 @@ def showMenu(restaurant_id):
 def newRestaurant():
 	if request.method == 'POST':
 		newRestaurant = Restaurant(name = request.form['name'])
-		#session.add(newRestaurant)
-		#session.commit()
+		database_access.addRestaurant(newRestaurant)
 		return redirect(url_for('showRestaurants'))
 	else:
 		return render_template('newRestaurant.html')
@@ -71,8 +70,7 @@ def newRestaurant():
 def newMenuItem(restaurant_id):
 	if request.method == 'POST':
 		newItem = MenuItem(name = request.form['name'], description = request.form['description'], price = request.form['price'], course = request.form['course'], restaurant_id = restaurant_id)
-		#session.add(newItem)
-		#session.commit()
+		database_access.addMenuItem(newItem)
 		return redirect(url_for('showMenu', restaurant_id = restaurant_id))
 	else:
 		return render_template('newmenuitem.html', restaurant_id = restaurant_id)
@@ -82,11 +80,12 @@ def newMenuItem(restaurant_id):
 #Edit a restaurant
 @app.route('/restaurants/<int:restaurant_id>/edit', methods=['GET','POST'])
 def editRestaurant(restaurant_id):
-	editedRestaurant = fakes.restaurant
-	#editedRestaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
+	#editedRestaurant = fakes.restaurant
+	editedRestaurant = database_access.getRestaurant(restaurant_id)
 	if request.method == 'POST':
 		if request.form['name']:
 			editedRestaurant.name = request.form['name']
+			database_access.updateRestaurant(editedRestaurant)
 			return redirect(url_for('showRestaurants'))
 	else:
 		return render_template('editRestaurant.html', restaurant = editedRestaurant)
@@ -94,8 +93,8 @@ def editRestaurant(restaurant_id):
 #Edit a restaurant menu item
 @app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/edit', methods = ['GET', 'POST'])
 def editMenuItem(restaurant_id, menu_id):
-	editedItem = fakes.item
-	#editedItem = session.query(MenuItem).filter_by(id = menu_id).one()
+	#editedItem = fakes.item
+	editedItem = database_access.getMenuItem(menu_id)
 	if request.method == 'POST':
 		if request.form['name']:
 			editedItem.name = request.form['name']
@@ -105,8 +104,7 @@ def editMenuItem(restaurant_id, menu_id):
 			editedItem.price = request.form['price']
 		if request.form['course']:
 			editedItem.course = request.form['course']
-		#session.add(editedItem)
-		#session.commit() 
+		database_access.updateMenuItem(editedItem)
 		return redirect(url_for('showMenu', restaurant_id = restaurant_id))
 	else:		
 		return render_template('editmenuitem.html', restaurant_id = restaurant_id, menu_id = menu_id, item = editedItem)
@@ -114,11 +112,10 @@ def editMenuItem(restaurant_id, menu_id):
 #Delete a restaurant
 @app.route('/restaurants/<int:restaurant_id>/delete', methods = ['GET','POST'])
 def deleteRestaurant(restaurant_id):
-	restaurantToDelete = fakes.restaurant
-	#restaurantToDelete = session.query(Restaurant).filter_by(id = restaurant_id).one()
+	#restaurantToDelete = fakes.restaurant
+	restaurantToDelete = database_access.getRestaurant(restaurant_id)
 	if request.method == 'POST':
-		#session.delete(restaurantToDelete)
-		#session.commit()
+		database_access.deleteRestaurant(restaurantToDelete)
 		return redirect(url_for('showRestaurants', restaurant_id = restaurant_id))
 	else:
 		return render_template('deleteRestaurant.html',restaurant = restaurantToDelete)
@@ -126,11 +123,10 @@ def deleteRestaurant(restaurant_id):
 #Delete a menu item
 @app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/delete', methods = ['GET', 'POST'])
 def deleteMenuItem(restaurant_id, menu_id):
-	itemToDelete = fakes.item
-	#itemToDelete = session.query(MenuItem).filter_by(id = menu_id).one() 
+	#itemToDelete = fakes.item
+	itemToDelete = database_access.getMenuItem(menu_id)
 	if request.method == 'POST':
-		#session.delete(itemToDelete)
-		#session.commit()
+		database_access.deleteMenuItem(itemToDelete)
 		return redirect(url_for('showMenu', restaurant_id = restaurant_id))
 	else:
 		return render_template('deleteMenuItem.html', item = itemToDelete)
