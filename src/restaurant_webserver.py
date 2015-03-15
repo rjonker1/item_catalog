@@ -51,7 +51,6 @@ def showMenu(restaurant_id):
 	# restaurant = fakes.restaurant
 	# items = fakes.items
 	restaurant = database_access.getRestaurant(restaurant_id)
-	print(restaurant)
 	items = database_access.getMenuItems(restaurant_id)
 	return render_template('menu.html', items = items, restaurant = restaurant)
 

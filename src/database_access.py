@@ -14,8 +14,8 @@ def getRestaurants():
 def getRestaurant(restaurant_id):
 	return session.query(Restaurant).filter_by(id = restaurant_id).one()
 
-def getRestaurantMenuItems(restaurant_id):
-	return session.query(MenuItem).filter_by(restaurant_id = restaurant_id).all()
+def getMenuItems(restaurantid):
+	return session.query(MenuItem).filter_by(restaurant_id = restaurantid).all()
 
 def getMenuItem(menu_id):
 	return session.query(MenuItem).filter_by(id = menu_id).one()
