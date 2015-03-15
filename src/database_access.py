@@ -20,11 +20,13 @@ def getMenuItems(restaurantid):
 def getMenuItem(menu_id):
 	return session.query(MenuItem).filter_by(id = menu_id).one()
 
-def addRestaurant(restaurant):
+def addRestaurant(restaurant_name):
+	restaurant = Restaurant(name = restaurant_name)
 	session.add(restaurant)
 	session.commit()
 
-def addMenuItem(menuItem):
+def addMenuItem(menuItem_name, menuItem_description, menuItem_price, menuItem_course, menuItem_restaurant_id):
+	menuItem = MenuItem(name = menuItem_name, description = menuItem_description, price = menuItem_price, course = menuItem_course, restaurant_id = menuItem_restaurant_id)
 	session.add(menuItem)
 	session.commit()
 

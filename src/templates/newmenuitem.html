@@ -1,23 +1,21 @@
-<html>
-<head>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
-	</head>
-<body>
+{% extends "layout.html" %}
+{% block body %}
 <h1>New Menu Item</h1>
-<form action="#" method = 'post'>
-	<p>Name:</p>
-		<input type ='text' size='30' name='name'>
-	<p>Description:</p>
-		<input type ='text' size='30' name='description'>
-	<p>Price:</p>
-		<input type ='text' size='30' name='price'>
-	<p>Course:</p>
-		<input type ='radio'  name='course' value ='Appetizer'>Appetizer</br>
-		<input type ='radio'  name='course' value ='Entree'>Entree</br>
-		<input type ='radio' name='course' value ='Dessert'>Dessert</br>
-		<input type ='radio'  name='course' value ='Beverage'>Beverage</br>
-	</br>
-<input type='submit' value='Create'>
+<form action="#" method='post'>
+    <p>Name:</p>
+    <input type='text' size='30' name='name' maxlength='80' required>
+    <p>Description:</p>
+    <input type='text' size='30' name='description' maxlength='250' required>
+    <p>Price:</p>
+    <input type='number' pattern='^\d+(\.|\,)\d{2}$' size='30' name='price' required>
+    <p>Course:</p>
+    <input type='radio' name='course' value='Appetizer'>Appetizer</br>
+    <input type='radio' name='course' value='Entree'>Entree</br>
+    <input type='radio' name='course' value='Main'>Main</br>
+    <input type='radio' name='course' value='Dessert'>Dessert</br>
+    <input type='radio' name='course' value='Beverage'>Beverage</br>
+    </br>
+    <input type='submit' value='Create'>
+    <a href='\'> Cancel </a>
 </form>
-</body>
-</html>
+{% endblock %}

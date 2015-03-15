@@ -1,5 +1,6 @@
 ## Flask micro framework ##
-from flask import Flask, render_template, request, redirect, url_for, jsonify, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify, url_for,flash, Markup, abort
+from jinja2 import TemplateNotFound
 app = Flask(__name__)
 
 ## Fakes  ##
@@ -7,235 +8,168 @@ app = Flask(__name__)
 
 ## DAL ##
 import database_access
-
-# from sqlalchemy import create_engine
-# from sqlalchemy.orm import sessionmaker
-# from database_setup import Base, Restaurant, MenuItem
-
-# engine = create_engine('sqlite:///restaurantmenu.db')
-# Base.metadata.bind = engine
-
-# DBSession = sessionmaker(bind=engine)
-# session = DBSession()
-
 ## Api returning JSON ##
 
 @app.route('/restaurants/<int:restaurant_id>/menu/JSON')
 def restaurantMenuJSON(restaurant_id):
-	restaurant = database_access.getRestaurant(restaurant_id)
-	items = database_access.getMenuItems(restaurant_id)
-	return jsonify(MenuItems=[i.serialize for i in items])
+	try:
+		restaurant = database_access.getRestaurant(restaurant_id)
+		items = database_access.getMenuItems(restaurant_id)
+		return jsonify(MenuItems=[i.serialize for i in items])
+	except Exception:
+		abort(500)
+	
 
 @app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/JSON')
 def menuItemJSON(restaurant_id, menu_id):
-	Menu_Item = database_access.getMenuItem(menu_id)
-	return jsonify(Menu_Item = Menu_Item.serialize)
+	try:
+		Menu_Item = database_access.getMenuItem(menu_id)
+		return jsonify(Menu_Item = Menu_Item.serialize)
+	except Exception:
+		abort(500)
 
 @app.route('/restaurants/JSON')
 def restaurantsJSON():
-	restaurants = database_access.getRestaurants()
-	return jsonify(restaurants= [r.serialize for r in restaurants])
+	try:
+		restaurants = database_access.getRestaurants()
+		return jsonify(restaurants= [r.serialize for r in restaurants])
+	except Exception:
+		abort(500)	
 
 #Show all restaurants
 @app.route('/')
 @app.route('/restaurants/')
 def showRestaurants():
-	#restaurants = fakes.restaurants
-	restaurants = database_access.getRestaurants()
-	return render_template('restaurants.html', restaurants = restaurants)
+	try:
+		restaurants = database_access.getRestaurants()
+		return render_template('restaurants.html', restaurants = restaurants)
+	except TemplateNotFound:
+		abort(404)
+	except Exception:
+		abort(500)	
 
 #Show a restaurant menu
 @app.route('/restaurants/<int:restaurant_id>/')
 @app.route('/restaurants/<int:restaurant_id>/menu')
 def showMenu(restaurant_id):
-	# restaurant = fakes.restaurant
-	# items = fakes.items
-	restaurant = database_access.getRestaurant(restaurant_id)
-	items = database_access.getMenuItems(restaurant_id)
-	return render_template('menu.html', items = items, restaurant = restaurant)
+	try:
+		restaurant = database_access.getRestaurant(restaurant_id)
+		items = database_access.getMenuItems(restaurant_id)
+		return render_template('menu.html', items = items, restaurant = restaurant)
+	except TemplateNotFound:
+		abort(404)
+	except Exception:
+		abort(500)
 
 #Create a new restaurant
 @app.route('/restaurants/new', methods=['GET','POST'])
 def newRestaurant():
-	if request.method == 'POST':
-		newRestaurant = Restaurant(name = request.form['name'])
-		database_access.addRestaurant(newRestaurant)
-		return redirect(url_for('showRestaurants'))
-	else:
-		return render_template('newRestaurant.html')
+	try:
+		if request.method == 'POST':
+			name = request.form['name']
+			database_access.addRestaurant(name)
+			message = Markup("<h4>%s Created</h4>" % name )
+			flash(message)
+			return redirect(url_for('showRestaurants'))
+		else:
+			return render_template('newRestaurant.html')		
+	except TemplateNotFound:
+		abort(404)
+	except Exception:
+		abort(500)
+	
 
 #Create a new menu item
 @app.route('/restaurants/<int:restaurant_id>/menu/new', methods=['GET','POST'])
 def newMenuItem(restaurant_id):
-	if request.method == 'POST':
-		newItem = MenuItem(name = request.form['name'], description = request.form['description'], price = request.form['price'], course = request.form['course'], restaurant_id = restaurant_id)
-		database_access.addMenuItem(newItem)
-		return redirect(url_for('showMenu', restaurant_id = restaurant_id))
-	else:
-		return render_template('newmenuitem.html', restaurant_id = restaurant_id)
-
-	return render_template('newMenuItem.html', restaurant = restaurant)
+	try:
+		if request.method == 'POST':
+			database_access.addMenuItem(request.form['name'], request.form['description'], request.form['price'], request.form['course'], restaurant_id)
+			message = Markup("<h4>%s Created</h4>" % request.form['name'])
+			flash(message)
+			return redirect(url_for('showMenu', restaurant_id = restaurant_id))
+		else:
+			return render_template('newmenuitem.html', restaurant_id = restaurant_id)		
+	except TemplateNotFound:
+		abort(404)
+	except Exception:
+		abort(500)
 
 #Edit a restaurant
 @app.route('/restaurants/<int:restaurant_id>/edit', methods=['GET','POST'])
 def editRestaurant(restaurant_id):
-	#editedRestaurant = fakes.restaurant
-	editedRestaurant = database_access.getRestaurant(restaurant_id)
-	if request.method == 'POST':
-		if request.form['name']:
+	#editedRestaurant = fakes.restaurant	
+	try:
+		editedRestaurant = database_access.getRestaurant(restaurant_id)
+		if request.method == 'POST':
 			editedRestaurant.name = request.form['name']
 			database_access.updateRestaurant(editedRestaurant)
+			message = Markup("<h4>%s Updated</h4>" % editedRestaurant.name)
+			flash(message)
 			return redirect(url_for('showRestaurants'))
-	else:
-		return render_template('editRestaurant.html', restaurant = editedRestaurant)
+		else:
+			return render_template('editRestaurant.html', restaurant = editedRestaurant)
+	except TemplateNotFound:
+		abort(404)
+	except Exception:
+		abort(500)	
 
 #Edit a restaurant menu item
 @app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/edit', methods = ['GET', 'POST'])
 def editMenuItem(restaurant_id, menu_id):
-	#editedItem = fakes.item
-	editedItem = database_access.getMenuItem(menu_id)
-	if request.method == 'POST':
-		if request.form['name']:
+	try:
+		editedItem = database_access.getMenuItem(menu_id)
+		if request.method == 'POST':
 			editedItem.name = request.form['name']
-		if request.form['description']:
-			editedItem.description = request.form['name']
-		if request.form['price']:
+			editedItem.description = request.form['description']
 			editedItem.price = request.form['price']
-		if request.form['course']:
 			editedItem.course = request.form['course']
-		database_access.updateMenuItem(editedItem)
-		return redirect(url_for('showMenu', restaurant_id = restaurant_id))
-	else:		
-		return render_template('editmenuitem.html', restaurant_id = restaurant_id, menu_id = menu_id, item = editedItem)
+			database_access.updateMenuItem(editedItem)
+			message = Markup("<h4>%s Updated</h4>" % editedItem.name)
+			flash(message)
+			return redirect(url_for('showMenu', restaurant_id = restaurant_id))			
+		else:
+			return render_template('editmenuitem.html', restaurant_id = restaurant_id, menu_id = menu_id, item = editedItem)
+	except TemplateNotFound:
+		abort(404)		
+	except Exception:
+		abort(500)
 
 #Delete a restaurant
 @app.route('/restaurants/<int:restaurant_id>/delete', methods = ['GET','POST'])
 def deleteRestaurant(restaurant_id):
-	#restaurantToDelete = fakes.restaurant
-	restaurantToDelete = database_access.getRestaurant(restaurant_id)
-	if request.method == 'POST':
-		database_access.deleteRestaurant(restaurantToDelete)
-		return redirect(url_for('showRestaurants', restaurant_id = restaurant_id))
-	else:
-		return render_template('deleteRestaurant.html',restaurant = restaurantToDelete)
+	try:
+		restaurantToDelete = database_access.getRestaurant(restaurant_id)
+		if request.method == 'POST':
+			database_access.deleteRestaurant(restaurantToDelete)
+			message = Markup("<h4>%s Deleted</h4>" % restaurantToDelete.name)
+			flash(message)
+			return redirect(url_for('showRestaurants', restaurant_id = restaurant_id))
+		else:
+			return render_template('deleteRestaurant.html',restaurant = restaurantToDelete)
+	except TemplateNotFound:
+		abort(404)
+	except Exception:
+		abort(500)
 
 #Delete a menu item
 @app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/delete', methods = ['GET', 'POST'])
 def deleteMenuItem(restaurant_id, menu_id):
-	#itemToDelete = fakes.item
-	itemToDelete = database_access.getMenuItem(menu_id)
-	if request.method == 'POST':
-		database_access.deleteMenuItem(itemToDelete)
-		return redirect(url_for('showMenu', restaurant_id = restaurant_id))
-	else:
-		return render_template('deleteMenuItem.html', item = itemToDelete)
-
-
-# #Show all restaurants
-# @app.route('/')
-# @app.route('/restaurant/')
-# def showRestaurants():
-# 	restaurants = session.query(Restaurant).all()
-# 	#return "This page will show all my restaurants"
-# 	return render_template('restaurants.html', restaurants = restaurants)
-
-# #Create a new restaurant
-# @app.route('/restaurant/new/', methods=['GET','POST'])
-# def newRestaurant():
-# 	if request.method == 'POST':
-# 		newRestaurant = Restaurant(name = request.form['name'])
-# 		session.add(newRestaurant)
-# 		session.commit()
-# 		return redirect(url_for('showRestaurants'))
-# 	else:
-# 		return render_template('newRestaurant.html')
-# 	#return "This page will be for making a new restaurant"
-
-# #Edit a restaurant
-# @app.route('/restaurant/<int:restaurant_id>/edit/', methods = ['GET', 'POST'])
-# def editRestaurant(restaurant_id):
-# 	editedRestaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
-# 	if request.method == 'POST':
-# 		if request.form['name']:
-# 			editedRestaurant.name = request.form['name']
-# 			return redirect(url_for('showRestaurants'))
-# 	else:
-# 		return render_template('editRestaurant.html', restaurant = editedRestaurant)
-
-# 	#return 'This page will be for editing restaurant %s' % restaurant_id
-
-# #Delete a restaurant
-# @app.route('/restaurant/<int:restaurant_id>/delete/', methods = ['GET','POST'])
-# def deleteRestaurant(restaurant_id):
-# 	restaurantToDelete = session.query(Restaurant).filter_by(id = restaurant_id).one()
-# 	if request.method == 'POST':
-# 		session.delete(restaurantToDelete)
-# 		session.commit()
-# 		return redirect(url_for('showRestaurants', restaurant_id = restaurant_id))
-# 	else:
-# 		return render_template('deleteRestaurant.html',restaurant = restaurantToDelete)
-# 	#return 'This page will be for deleting restaurant %s' % restaurant_id
-
-# #Show a restaurant menu
-# @app.route('/restaurant/<int:restaurant_id>/')
-# @app.route('/restaurant/<int:restaurant_id>/menu/')
-# def showMenu(restaurant_id):
-# 	restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
-# 	items = session.query(MenuItem).filter_by(restaurant_id = restaurant_id).all()
-# 	return render_template('menu.html', items = items, restaurant = restaurant)
-# 	 #return 'This page is the menu for restaurant %s' % restaurant_id
-
-# #Create a new menu item
-# @app.route('/restaurant/<int:restaurant_id>/menu/new/',methods=['GET','POST'])
-# def newMenuItem(restaurant_id):
-# 	if request.method == 'POST':
-# 		newItem = MenuItem(name = request.form['name'], description = request.form['description'], price = request.form['price'], course = request.form['course'], restaurant_id = restaurant_id)
-# 		session.add(newItem)
-# 		session.commit()
-		
-# 		return redirect(url_for('showMenu', restaurant_id = restaurant_id))
-# 	else:
-# 		return render_template('newmenuitem.html', restaurant_id = restaurant_id)
-
-# 	return render_template('newMenuItem.html', restaurant = restaurant)
-# 	#return 'This page is for making a new menu item for restaurant %s' %restaurant_id
-
-# #Edit a menu item
-# @app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/edit', methods=['GET','POST'])
-# def editMenuItem(restaurant_id, menu_id):
-# 	editedItem = session.query(MenuItem).filter_by(id = menu_id).one()
-# 	if request.method == 'POST':
-# 		if request.form['name']:
-# 			editedItem.name = request.form['name']
-# 		if request.form['description']:
-# 			editedItem.description = request.form['name']
-# 		if request.form['price']:
-# 			editedItem.price = request.form['price']
-# 		if request.form['course']:
-# 			editedItem.course = request.form['course']
-# 		session.add(editedItem)
-# 		session.commit() 
-# 		return redirect(url_for('showMenu', restaurant_id = restaurant_id))
-# 	else:
-		
-# 		return render_template('editmenuitem.html', restaurant_id = restaurant_id, menu_id = menu_id, item = editedItem)
-
-	
-# 	#return 'This page is for editing menu item %s' % menu_id
-
-# #Delete a menu item
-# @app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/delete', methods = ['GET','POST'])
-# def deleteMenuItem(restaurant_id,menu_id):
-# 	itemToDelete = session.query(MenuItem).filter_by(id = menu_id).one() 
-# 	if request.method == 'POST':
-# 		session.delete(itemToDelete)
-# 		session.commit()
-# 		return redirect(url_for('showMenu', restaurant_id = restaurant_id))
-# 	else:
-# 		return render_template('deleteMenuItem.html', item = itemToDelete)
-# 	#return "This page is for deleting menu item %s" % menu_id
-
+	try:
+		itemToDelete = database_access.getMenuItem(menu_id)
+		if request.method == 'POST':
+			database_access.deleteMenuItem(itemToDelete)
+			message = Markup("<h4>%s Deleted</h4>" % itemToDelete.name)
+			flash(message)
+			return redirect(url_for('showMenu', restaurant_id = restaurant_id))
+		else:
+			return render_template('deleteMenuItem.html', item = itemToDelete)
+	except TemplateNotFound:
+		abort(404)
+	except Exception:
+		abort(500)		
 
 if __name__ == '__main__':
+	app.secret_key = '@123(^0(%'
 	app.debug = True
 	app.run(host = '0.0.0.0', port = 5000)
