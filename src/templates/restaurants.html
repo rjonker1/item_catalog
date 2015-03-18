@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
-{% block body %}
-<div class='pane'>
+{% block content %}
+{% include 'flash.html' %}
+{% for restaurant in restaurants %}
+        {% include 'restaurant.html' %}
+{% endfor %}
+<!-- <div class='pane'>
     <h1>Restaurants</h1>
     <a href="{{url_for('newRestaurant')}}"> <h3> Create a New Restaurant </h3> </a>
 
@@ -13,5 +17,5 @@
     <p> <a href="{{url_for('deleteRestaurant',restaurant_id = restaurant.id)}}">Delete Restaurant</a> </p>
 
     {% endfor %}
-</div>
+</div> -->
 {% endblock %}
