@@ -1,5 +1,6 @@
 ## Flask micro framework ##
 from flask import Flask, render_template, request, redirect, url_for, jsonify, url_for,flash, Markup, abort
+from flask_bootstrap import Bootstrap
 from jinja2 import TemplateNotFound
 app = Flask(__name__)
 
