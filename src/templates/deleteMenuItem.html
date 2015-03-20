@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2> Delete {{item.name}}? </h2>
+{% include 'flash.html' %}
+<div class="well">
+<form class="form-horizontal" action="#" method='post'>
+    <input type='submit' , value='Delete'>
+    <a href='\restaurants\{{item.restaurant.id}}\menu'>Cancel</a>
+</form>
+</div>
+{% endblock %}
