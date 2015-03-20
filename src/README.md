@@ -1,6 +1,7 @@
 1. Run Database Setup
 2. Run seed_menu_data
 e.g. https://github.com/kamalgill/flask-appengine-template
+3. Update vagrant pip install flask-bootstrap
 
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">

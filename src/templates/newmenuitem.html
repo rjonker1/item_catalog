@@ -1,21 +1,41 @@
 {% extends "layout.html" %}
-{% block body %}
-<h1>New Menu Item</h1>
-<form action="#" method='post'>
-    <p>Name:</p>
-    <input type='text' size='30' name='name' maxlength='80' required>
-    <p>Description:</p>
-    <input type='text' size='30' name='description' maxlength='250' required>
-    <p>Price:</p>
-    <input type='number' pattern='^\d+(\.|\,)\d{2}$' size='30' name='price' required>
-    <p>Course:</p>
-    <input type='radio' name='course' value='Appetizer'>Appetizer</br>
-    <input type='radio' name='course' value='Entree'>Entree</br>
-    <input type='radio' name='course' value='Main'>Main</br>
-    <input type='radio' name='course' value='Dessert'>Dessert</br>
-    <input type='radio' name='course' value='Beverage'>Beverage</br>
+{% block content %}
+<h2>New Menu Item</h2>
+{% include 'flash.html' %}
+<div class="well">
+<form action="#" method='POST'>
+    <label>Name:</label>
+    <input type='text' name='name' maxlength='80' required>
+    <label>Description:</label>
+    <input type='text' name='description' maxlength='250' required>
+    <label>Price:</label>
+    <input type='text' placeholder="0.00" pattern='^\d+(\.|\,)\d{2}$' name='price' required>
+    <label>Course:</label>
+    <table class="table table-hover">
+        <tr>
+            <td width="5px"><input type='radio' name='course' value='Appetizer'></td>
+            <td>Appetizer</td>
+        </tr>
+        <tr>
+            <td width="5px"><input type='radio' name='course' value='Entree'></td>
+            <td>Entree</td>
+        </tr>
+        <tr>
+            <td width="5px"><input type='radio' name='course' value='Main'></td>
+            <td>Main</td>
+        </tr>
+        <tr>
+            <td width="5px"><input type='radio' name='course' value='Dessert'></td>
+            <td>Dessert</td>
+        </tr>
+        <tr>
+            <td width="5px"><input type='radio' name='course' value='Beverage'></td>
+            <td>Beverage</td>
+        </tr>
+    </table>
     </br>
     <input type='submit' value='Create'>
     <a href='\'> Cancel </a>
 </form>
+</div>
 {% endblock %}

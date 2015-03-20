@@ -1,9 +1,12 @@
 {% extends "layout.html" %}
-{% block body %}
-<h1>New Restaurant</h1>
-<form action="#" method='post'>
+{% block content %}
+<h2>New Restaurant</h2>
+{% include 'flash.html' %}
+<div class="well">
+<form class="form-horizontal" action="{{ url_for('newRestaurant')}}" method='post'>
     <p>Name:</p>
-    <input type='text' size='30' name='name' required>
+    <input type='text' name='name' required>
     <input type='submit' value='Create'>
 </form>
+</div>
 {% endblock %}

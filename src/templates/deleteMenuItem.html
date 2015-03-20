@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
-{% block body %}
-<h1> Are you sure you want to delete {{item.name}}? </h1>
-<form action="#" method='post'>
+{% block content %}
+<h2> Delete {{item.name}}? </h2>
+{% include 'flash.html' %}
+<div class="well">
+<form class="form-horizontal" action="#" method='post'>
     <input type='submit' , value='Delete'>
-</form><a href='#'> Cancel </a>
+    <a href='\restaurants\{{item.restaurant.id}}\menu'>Cancel</a>
+</form>
+</div>
 {% endblock %}

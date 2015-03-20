@@ -1,83 +1,70 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1> Edit Menu Item </h1>
-<div class="well">
+<h2>Edit {{item.name}}</h2>
 {% include 'flash.html' %}
-</div>
+<div class="well">
 <form class="form-horizontal" action="#" method="post">
-    <p>Name:</p>
-    <input type='text' size='30' name='name' maxlength='80' required placeholder='{{item.name }}'>
-    <p>Description:</p>
-    <input type='text' size='30' name='description' maxlength='250' required placeholder='{{item.description}}'>
-    <p>Price:</p>
-    <input type='number' pattern='^\d+(\.|\,)\d{2}$' size='30' name='price' required>
-    <!--<input type='text' size='30' name='price' maxlength='8' required placeholder='{{item.price}}'>-->
-    <p>Course:<p>
-
-        {% if item.course == 'Appetizer' %}
-        <dd><input type='radio' name='course' value='Appetizer' checked>Appetizer</dd>
-        {%else%}
-        <dd><input type='radio' name='course' value='Appetizer'>Appetizer</dd>
-        {% endif %}
-        {% if item.course == 'Entree' %}
-        <dd><input type='radio' name='course' value='Entree' checked>Entree</dd>
-        {%else%}
-        <dd><input type='radio' name='course' value='Entree'>Entree</dd>
-        {% endif %}
-        {% if item.course == 'Main' %}
-        <dd><input type='radio' name='course' value='Main' checked>Main</dd>
-        {%else%}
-        <dd><input type='radio' name='course' value='Main'>Main</dd>
-        {% endif %}
-        {% if item.course == 'Dessert'%}
-        <dd><input type='radio' name='course' value='Dessert' checked>Dessert</dd>
-        {% else %}
-        <dd><input type='radio' name='course' value='Dessert'>Dessert</dd>
-        {% endif %}
-        {%if item.course =='Beverage'%}
-        <dd><input type='radio' name='course' value='Beverage' checked>Beverage</dd>
-        {% else %}
-        <dd><input type='radio' name='course' value='Beverage'>Beverage</dd>
-        {% endif %}
-        <input type='submit' value='Edit'>
-        <a href='\'> Cancel </a>
+    <label>Name:</label>
+    <input type='text' name='name' maxlength='80' placeholder='{{item.name }}' value='{{item.name}}' required>
+    <label>Description:</label>
+    <input type='text' name='description' maxlength='250' placeholder='{{item.description}}' value='{{item.description}}' required>
+    <label>Price:</label>
+    <input type='text' placeholder="{{item.price}}" pattern='^\d+(\.|\,)\d{2}$' name='price' value="{{item.price}}" required>
+    <label>Course:<label>
+    <table class="table table-hover">
+        <tr>
+            <td width="5px">
+                {% if item.course == 'Appetizer' %}
+                    <input type='radio' name='course' value='Appetizer' checked>
+                {%else%}
+                    <input type='radio' name='course' value='Appetizer'>
+                {% endif %}
+            </td>
+            <td>Appetizer</td>
+        </tr>
+        <tr>
+            <td width="5px">
+                {% if item.course == 'Entree' %}
+                    <input type='radio' name='course' value='Entree' checked>
+                {%else%}
+                    <input type='radio' name='course' value='Entree'>
+                {% endif %}
+            </td>
+            <td>Entree</td>
+        </tr>
+        <tr>
+            <td width="5px">
+                {% if item.course == 'Main' %}
+                    <input type='radio' name='course' value='Main' checked>
+                {%else%}
+                    <input type='radio' name='course' value='Main'>
+                {% endif %}
+            </td>
+            <td>Main</td>
+        </tr>
+        <tr>
+            <td width="5px">
+                {% if item.course == 'Dessert' %}
+                    <input type='radio' name='course' value='Dessert' checked>
+                {%else%}
+                    <input type='radio' name='course' value='Dessert'>
+                {% endif %}
+            </td>
+            <td>Dessert</td>
+        </tr>
+        <tr>
+            <td width="5px">
+                {% if item.course == 'Beverage' %}
+                    <input type='radio' name='course' value='Beverage' checked>
+                {%else%}
+                    <input type='radio' name='course' value='Beverage'>
+                {% endif %}
+            </td>
+            <td>Beverage</td>
+        </tr>
+    </table>
+    <input type='submit' value='Edit'>
+    <a href='\restaurants\{{item.restaurant.id}}\menu'>Cancel</a>
 </form>
-
-<!-- <form action="#" method='post'>
-    <p>Name:</p>
-    <input type='text' size='30' name='name' maxlength='80' required placeholder='{{item.name }}'>
-    <p>Description:</p>
-    <input type='text' size='30' name='description' maxlength='250' required placeholder='{{item.description}}'>
-    <p>Price:</p>
-    <input type='number' pattern='^\d+(\.|\,)\d{2}$' size='30' name='price' required>
-    <p>Course:<p>
-
-        {% if item.course == 'Appetizer' %}
-        <dd><input type='radio' name='course' value='Appetizer' checked>Appetizer</dd>
-        {%else%}
-        <dd><input type='radio' name='course' value='Appetizer'>Appetizer</dd>
-        {% endif %}
-        {% if item.course == 'Entree' %}
-        <dd><input type='radio' name='course' value='Entree' checked>Entree</dd>
-        {%else%}
-        <dd><input type='radio' name='course' value='Entree'>Entree</dd>
-        {% endif %}
-        {% if item.course == 'Main' %}
-        <dd><input type='radio' name='course' value='Main' checked>Main</dd>
-        {%else%}
-        <dd><input type='radio' name='course' value='Main'>Main</dd>
-        {% endif %}
-        {% if item.course == 'Dessert'%}
-        <dd><input type='radio' name='course' value='Dessert' checked>Dessert</dd>
-        {% else %}
-        <dd><input type='radio' name='course' value='Dessert'>Dessert</dd>
-        {% endif %}
-        {%if item.course =='Beverage'%}
-        <dd><input type='radio' name='course' value='Beverage' checked>Beverage</dd>
-        {% else %}
-        <dd><input type='radio' name='course' value='Beverage'>Beverage</dd>
-        {% endif %}
-        <input type='submit' value='Edit'>
-        <a href='\'> Cancel </a>
-</form> -->
+</div>
 {% endblock %}

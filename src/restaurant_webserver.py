@@ -1,6 +1,6 @@
 ## Flask micro framework ##
 from flask import Flask, render_template, request, redirect, url_for, jsonify, url_for,flash, Markup, abort
-from flask_bootstrap import Bootstrap
+#from flask_bootstrap import Bootstrap
 from jinja2 import TemplateNotFound
 app = Flask(__name__)
 
@@ -53,14 +53,14 @@ def showRestaurants():
 @app.route('/restaurants/<int:restaurant_id>/')
 @app.route('/restaurants/<int:restaurant_id>/menu')
 def showMenu(restaurant_id):
-	try:
+	#try:		
 		restaurant = database_access.getRestaurant(restaurant_id)
 		items = database_access.getMenuItems(restaurant_id)
 		return render_template('menu.html', items = items, restaurant = restaurant)
-	except TemplateNotFound:
-		abort(404)
-	except Exception:
-		abort(500)
+	#except TemplateNotFound:
+		#abort(404)
+	#except Exception:
+		#abort(500)
 
 #Create a new restaurant
 @app.route('/restaurants/new', methods=['GET','POST'])
@@ -69,7 +69,7 @@ def newRestaurant():
 		if request.method == 'POST':
 			name = request.form['name']
 			database_access.addRestaurant(name)
-			message = Markup("<h4>%s Created</h4>" % name )
+			message = "%s Created" % name
 			flash(message)
 			return redirect(url_for('showRestaurants'))
 		else:
@@ -86,7 +86,7 @@ def newMenuItem(restaurant_id):
 	try:
 		if request.method == 'POST':
 			database_access.addMenuItem(request.form['name'], request.form['description'], request.form['price'], request.form['course'], restaurant_id)
-			message = Markup("<h4>%s Created</h4>" % request.form['name'])
+			message = "%s Created!" % request.form['name']
 			flash(message)
 			return redirect(url_for('showMenu', restaurant_id = restaurant_id))
 		else:
@@ -105,7 +105,7 @@ def editRestaurant(restaurant_id):
 		if request.method == 'POST':
 			editedRestaurant.name = request.form['name']
 			database_access.updateRestaurant(editedRestaurant)
-			message = Markup("<h4>%s Updated</h4>" % editedRestaurant.name)
+			message = "%s Updated!" % editedRestaurant.name
 			flash(message)
 			return redirect(url_for('showRestaurants'))
 		else:
@@ -126,7 +126,7 @@ def editMenuItem(restaurant_id, menu_id):
 			editedItem.price = request.form['price']
 			editedItem.course = request.form['course']
 			database_access.updateMenuItem(editedItem)
-			message = Markup("<h4>%s Updated</h4>" % editedItem.name)
+			message = "%s Updated!" % editedItem.name
 			flash(message)
 			return redirect(url_for('showMenu', restaurant_id = restaurant_id))			
 		else:
@@ -143,7 +143,7 @@ def deleteRestaurant(restaurant_id):
 		restaurantToDelete = database_access.getRestaurant(restaurant_id)
 		if request.method == 'POST':
 			database_access.deleteRestaurant(restaurantToDelete)
-			message = Markup("<h4>%s Deleted</h4>" % restaurantToDelete.name)
+			message = "%s Deleted!" % restaurantToDelete.name
 			flash(message)
 			return redirect(url_for('showRestaurants', restaurant_id = restaurant_id))
 		else:
@@ -160,7 +160,7 @@ def deleteMenuItem(restaurant_id, menu_id):
 		itemToDelete = database_access.getMenuItem(menu_id)
 		if request.method == 'POST':
 			database_access.deleteMenuItem(itemToDelete)
-			message = Markup("<h4>%s Deleted</h4>" % itemToDelete.name)
+			message = "%s Deleted!" % itemToDelete.name
 			flash(message)
 			return redirect(url_for('showMenu', restaurant_id = restaurant_id))
 		else:
