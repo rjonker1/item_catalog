@@ -53,14 +53,14 @@ def showRestaurants():
 @app.route('/restaurants/<int:restaurant_id>/')
 @app.route('/restaurants/<int:restaurant_id>/menu')
 def showMenu(restaurant_id):
-	#try:		
+	try:		
 		restaurant = database_access.getRestaurant(restaurant_id)
 		items = database_access.getMenuItems(restaurant_id)
 		return render_template('menu.html', items = items, restaurant = restaurant)
-	#except TemplateNotFound:
-		#abort(404)
-	#except Exception:
-		#abort(500)
+	except TemplateNotFound:
+		abort(404)
+	except Exception:
+		abort(500)
 
 #Create a new restaurant
 @app.route('/restaurants/new', methods=['GET','POST'])
