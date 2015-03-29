@@ -4,6 +4,7 @@
 {% include 'flash.html' %}
 <div class="well">
 <form class="form-horizontal" action="#" method='post'>
+	<input name=_csrf_token type=hidden value="{{ csrf_token() }}">
     <input type='submit' , value='Delete'>
     <a href='\restaurants\{{item.restaurant.id}}\menu'>Cancel</a>
 </form>
