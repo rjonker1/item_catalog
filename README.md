@@ -20,7 +20,7 @@
 *	Install Vagrant and VirtualBox (https://www.udacity.com/wiki/ud197/install-vagrant)
 *	Launch the Vagrant VM (vagrant up)
 *	Within the VM, execute the database_setup.py file. A restaurantmenu.db should be created
-*	Within the VM, execute the restaurant_webserver.py file to start the web server
+*	Within the VM, execute the application.py file to start the web server
 *	Access the website using http://localhost:5000/
 
 ### Authentication ###
