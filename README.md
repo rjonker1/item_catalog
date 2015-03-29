@@ -38,4 +38,4 @@
 *	Git
 	*	git clone https://github.com/rjonker1/item_catalog.git
 *	Files
-	*	Files are found in src folder
+	*	Files are found in catalog folder
